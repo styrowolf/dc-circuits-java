@@ -1,0 +1,93 @@
+> Task :app:compileJava
+> Task :app:processResources NO-SOURCE
+> Task :app:classes
+
+> Task :app:run
+22.0
+7.0
+3.142857142857143
+Circuit {
+incoming voltage: 22.0
+current: 7.0
+resistance: 3.142857142857143
+elements:
+ParallelConnection {
+incoming voltage: 8.0
+current: 7.0
+resistance: 1.1428571428571428
+circuits:
+Circuit {
+incoming voltage: 8.0
+current: 1.0
+resistance: 8.0
+elements:
+Resistor {
+incoming voltage: 6.0
+current: 1.0
+resistance: 6.0
+}
+IdealAmmeter {
+incoming voltage: 0.0
+current: 1.0
+resistance: 0.0
+}
+Resistor {
+incoming voltage: 2.0
+current: 1.0
+resistance: 2.0
+}
+}
+Circuit {
+incoming voltage: 8.0
+current: 4.0
+resistance: 2.0
+elements:
+Resistor {
+incoming voltage: 8.0
+current: 4.0
+resistance: 2.0
+}
+IdealAmmeter {
+incoming voltage: 0.0
+current: 4.0
+resistance: 0.0
+}
+}
+Circuit {
+incoming voltage: 8.0
+current: 2.0
+resistance: 4.0
+elements:
+Resistor {
+incoming voltage: 8.0
+current: 2.0
+resistance: 4.0
+}
+IdealAmmeter {
+incoming voltage: 0.0
+current: 2.0
+resistance: 0.0
+}
+}
+Circuit {
+incoming voltage: 8.0
+current: 0.0
+resistance: Infinity
+elements:
+IdealVoltmeter {
+incoming voltage: 8.0
+current: 0.0
+resistance: Infinity
+}
+}
+}
+Resistor {
+incoming voltage: 14.0
+current: 7.0
+resistance: 2.0
+}
+}
+
+
+BUILD SUCCESSFUL in 3s
+2 actionable tasks: 2 executed
