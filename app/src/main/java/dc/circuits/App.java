@@ -5,11 +5,17 @@ package dc.circuits;
 
 import java.lang.Math;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+/*
+ * TO-DO:
+ * Seperate classes into different files.
+*/
 
+public class App {
+
+    // testing the code I wrote in main
+    // this code is better off as a library though
+    // I was tired of calculating these by hand
+    // in mastering physics, so why not write some code?
     public static void main(String[] args) {
         ParallelConnection pc = new ParallelConnection(
             new CircuitElement[] {
@@ -45,12 +51,20 @@ public class App {
     }
 }
 
+// an abstract class to unify the fields 
+// and the interfaces of all circuit elements
 abstract class CircuitElement {
     double incoming_voltage;
     double resistance;
     double current; 
     boolean is_init;
     
+    // these "set" functions are from the Rust prototype I'd written
+    // for the sake of being parallel.
+    // that implementation is a bit different as there is no such thing
+    // as inheritence in Rust, there is only composition.
+    // I had used these "set" functions to write to the fields 
+    // but in Java, you can just use abstract classes.
     public void set_voltage(double v) {
         this.incoming_voltage = v;
     }
@@ -68,10 +82,14 @@ abstract class CircuitElement {
     public abstract double current();
     public abstract double resistance();
 
+    // Is there an interface to display the classes?
+    // In Rust, there is std::fmt::Display for this.
     public abstract String name();
     public abstract String display();
 }
 
+// a Circuit, which houses an undeterminate number of elements 
+// connected in serial in the order of the array.
 // the incoming_voltage field is assumed as initialized to the correct value
 class Circuit extends CircuitElement {
     CircuitElement[] elements;
@@ -81,18 +99,23 @@ class Circuit extends CircuitElement {
         this.is_init = false;
         this.elements = e;
     }
+
     // always call calculate on main circuit before accessing the fields
     public void calculate() {
         this.calculate_resistance();
         this.set_current(this.voltage() / this.resistance());
+        // if this variable is not set here, recursion
         is_init = true;
         for (int i = 0; i < this.elements.length; i++) {
             this.elements[i].set_current(this.current());
             if (this.elements.length == 1) {
+                // handling an edge case where an ideal voltmeter 
+                // is the only element in the circuit since I = V / (R = inf)
                 this.elements[i].set_voltage(this.voltage());
             } else {
                 this.elements[i].set_voltage(this.elements[i].resistance() * this.current());
             }
+            // call calculate on elements to fill their fields.
             this.elements[i].calculate();
         }
     }
@@ -115,6 +138,8 @@ class Circuit extends CircuitElement {
         return this.resistance;
     }
 
+    // adds all the resistances of the circuit elements
+    // since they are all connected in serial
     public void calculate_resistance() {
         double r = 0;
         for (int i = 0; i < this.elements.length; i++) {
@@ -127,6 +152,8 @@ class Circuit extends CircuitElement {
         return "Circuit";
     }
 
+    // this is the basic display function I wrote,
+    // as an alternative to Rust's std::fmt::Debug
     public String display() {
         String s = new String();
         s += this.name() + " {\n";
@@ -142,6 +169,8 @@ class Circuit extends CircuitElement {
     }
 }
 
+// ParallelConnection represents the elements (also other Circuits, 
+// which houses many elements connected in serial) connected in parallel.
 // the incoming_voltage field is assumed as initialized to the correct value
 class ParallelConnection extends CircuitElement {
     CircuitElement[] circuits;
@@ -151,6 +180,7 @@ class ParallelConnection extends CircuitElement {
         this.circuits = c;
     }
 
+    // R_eq^-1 = (1/R_1 + ... + 1/R_n)
     public double resistance() {
         if (!is_init) {
             double r = 0;
@@ -173,6 +203,7 @@ class ParallelConnection extends CircuitElement {
         return this.current;
     }
 
+    // voltage is same for each of the elements connected in parallel
     public void calculate() {
         for (int i = 0; i < this.circuits.length; i++) {
             this.circuits[i].set_voltage(this.voltage());
@@ -201,11 +232,13 @@ class ParallelConnection extends CircuitElement {
     }
 }
 
+// A basic resistor
 class Resistor extends CircuitElement {
     public Resistor(double r) {
         this.resistance = r;
     }
 
+    // there is nothing to calculate for this element
     public void calculate() {}
 
     public double voltage() {
@@ -235,11 +268,13 @@ class Resistor extends CircuitElement {
     }
 }
 
+// An ideal ammeter
 class IdealAmmeter extends CircuitElement {
     public IdealAmmeter() {
         this.resistance = 0;
     }
 
+    // there is nothing to calculate for this element
     public void calculate() {}
 
     public double voltage() {
@@ -269,11 +304,13 @@ class IdealAmmeter extends CircuitElement {
     }
 }
 
+// An ideal voltmeter
 class IdealVoltmeter extends CircuitElement {
     public IdealVoltmeter() {
         this.resistance = Double.POSITIVE_INFINITY;
     }
 
+    // there is nothing to calculate for this element
     public void calculate() {}
 
     public double voltage() {
